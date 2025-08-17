@@ -1,0 +1,4 @@
+# _config.yml
+title: Hexapod Robot Project Journal
+description: Development updates for the ROS 2 Freenove Hexapod.
+theme: jekyll-theme-minimal
