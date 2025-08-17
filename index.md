@@ -18,7 +18,7 @@ Here, I'll post updates, videos, and technical deep dives as I work on the robot
  
 ---
 
-### Journal Entries
+## Progress and Journal Entries
 
 <ul>
   {% for post in site.posts %}

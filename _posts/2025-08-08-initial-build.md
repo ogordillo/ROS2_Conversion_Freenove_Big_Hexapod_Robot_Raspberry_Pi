@@ -10,8 +10,14 @@ Since I was a teenager, I've always really wanted to learn ROS. I've installed i
 
 For now, check out this 2-minute time lapse of the 6 hours it took me to build the robot. 
 
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-  <iframe src="https://youtube.com/shorts/UhZJ0yrpg-4?si=IKLmooua9T0st-uG" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+<div class="responsive-youtube-short">
+  <iframe
+    src="https://www.youtube.com/embed/UhZJ0yrpg-4"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen>
+  </iframe>
 </div>
 
 ### Next Steps
