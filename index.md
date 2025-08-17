@@ -16,16 +16,6 @@ My goals are to contribute to the fast growing world of humanoid robotics and th
 
 Here, I'll post updates, videos, and technical deep dives as I work on the robot. 
 
-### Journal Entries
-
-<ul>
-  {% for post in site.posts %}
-    <li>
-      <a href="{{ post.url | relative_url }}">{{ post.title }}</a> - <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
-    </li>
-  {% endfor %}
-</ul>
-
 ## Main Code Repository:
 [ogordillo/ROS2_Hexapod](https://github.com/ogordillo/ROS2_Conversion_Freenove_Big_Hexapod_Robot_Raspberry_Pi/foxy-develop)
 
@@ -37,3 +27,15 @@ Aside from a laptop with Windows 11, these are the parts I'm using. Some of thes
 - [Nvidia Jetson TX2 - Amazon Link](https://amzn.to/3JlThQk)
 - [Jetson TX2 Orbitty Carrier Board - Vender Link](https://www.google.com/url?sa=j&url=https%3A%2F%2Fconnecttech.com%2Fproduct%2Forbitty-carrier-for-nvidia-jetson-tx2-tx1%2F&uct=1750005445&usg=oWNIqRq9dAVoZOkQFAXqlN4Yqbw.&opi=73833047&source=chat)
 - [Intel Realsense Depth Camera D435 - Amazon Link](https://amzn.to/46X4d0F)
+
+---
+
+### Journal Entries
+
+<ul>
+  {% for post in site.posts %}
+    <li>
+      <a href="{{ post.url | relative_url }}">{{ post.title }}</a> - <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+    </li>
+  {% endfor %}
+</ul>
