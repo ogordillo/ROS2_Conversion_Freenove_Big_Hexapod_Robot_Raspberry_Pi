@@ -10,7 +10,7 @@ My name is Orlando Gordillo. I was born in the small town Laredo, Texas. I have 
 I have 10 years industry experience doing Robotics Operations and Software Development. 
 
 I've always been curious to learn about ROS and I've now officially started my journey.
-My personal goal is to contribute to the fast growing world of humanoid robotics and their intergration into our everyday lives. I know this robot is not exactly humanioid or humanoid-ish, but this Hexapod is a start and I hope the lessons here translate to the more advanced robotics projects I hope to undertake. 
+My personal goal is to contribute to the fast growing world of humanoid robotics and their intergration into our everyday lives. I know this robot is not exactly humanioid or even humanoid-ish, but this Hexapod is a start into ROS and distributed Robotics. The lessons here will translate to the more advanced robotics topics I hope to undertake. 
  
 ---
 
