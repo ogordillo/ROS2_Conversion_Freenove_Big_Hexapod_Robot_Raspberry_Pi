@@ -1,12 +1,12 @@
 ---
 layout: default
-title:  "Day 1 - If you build it, they will come."
+title:  "Week 1 - If you build it, they will come."
 date:   2025-08-08
 ---
 
 ## Robot Building Montage!
 
-TL;DR; - The people at TXRX point me in the right direction! Here is a fun video of me building the hexapod!
+#### TL;DR; - The people at TXRX point me in the right direction! Here is a fun video of me building the hexapod!
 
 Since I was a teenager, I've always wanted to learn ROS. I've installed it before, messed around with gazebo, but never really made or controlled a real robot. Fast-forward 18 years to a C.S. degree, hack-a-thon gold medals, a vast network of like-minded friends and colleagues, commanding space robotics on the International Space Station, and now I've finally begun to dedicate myself to actually programming robots. 
 
@@ -25,4 +25,4 @@ For now, check out this 2-minute time lapse of the 6 hours it took me to build t
 </iframe>
 
 ### Next Steps
-Think about how I'm going to design and implement a ROS network of components. My spidey senses are telling me I'll need ROS Foxy because of the jetson tx2 being EOL and I'll probably want to use docker on everything to keep things repeatable and swappable. Stay tuned for the next one!
+Now that I've gotten the robot set up and working with the open-source provided software, I need to think about how I'm going to design and implement a ROS network of components. My spidey senses are telling me I'll need ROS Foxy because of the jetson tx2 being EOL and I'll probably want to use docker on everything to keep things repeatable and swappable. Stay tuned for the next one!

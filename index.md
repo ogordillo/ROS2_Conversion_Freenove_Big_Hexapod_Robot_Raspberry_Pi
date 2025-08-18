@@ -29,7 +29,7 @@ In my posts I'll include updates, videos, and technical deep dives as I work on 
 ---
 
 ## Main Code Repository:
-[ogordillo/ROS2_Hexapod](https://github.com/ogordillo/ROS2_Conversion_Freenove_Big_Hexapod_Robot_Raspberry_Pi/foxy-develop)
+[ogordillo/ROS2_Hexapod](https://github.com/ogordillo/ROS2_Conversion_Freenove_Big_Hexapod_Robot_Raspberry_Pi/tree/foxy-develop)
 
 
 ## Parts List:
