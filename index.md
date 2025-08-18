@@ -37,5 +37,5 @@ Aside from a laptop with Windows 11, these are the parts I'm using. Some of thes
 - [Freenove Big Hexapod FNK0052 - Amazon Link](https://amzn.to/47vyFz6)
 - [Raspberry Pi 5 - Amazon Link](https://amzn.to/45EQbOT)
 - [Nvidia Jetson TX2 - Amazon Link](https://amzn.to/3JlThQk)
-- [Jetson TX2 Orbitty Carrier Board - Vender Link](https://www.google.com/url?sa=j&url=https%3A%2F%2Fconnecttech.com%2Fproduct%2Forbitty-carrier-for-nvidia-jetson-tx2-tx1%2F&uct=1750005445&usg=oWNIqRq9dAVoZOkQFAXqlN4Yqbw.&opi=73833047&source=chat)
+- [Jetson TX2 Orbitty Carrier Board - Vendor Link](https://www.google.com/url?sa=j&url=https%3A%2F%2Fconnecttech.com%2Fproduct%2Forbitty-carrier-for-nvidia-jetson-tx2-tx1%2F&uct=1750005445&usg=oWNIqRq9dAVoZOkQFAXqlN4Yqbw.&opi=73833047&source=chat)
 - [Intel Realsense Depth Camera D435 - Amazon Link](https://amzn.to/46X4d0F)
