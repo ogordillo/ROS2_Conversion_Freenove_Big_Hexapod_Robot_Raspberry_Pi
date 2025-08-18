@@ -1,29 +1,27 @@
 ---
 layout: default
 ---
-# My Hexapod ROS Dev Journal 
+# My Hexapod ROS 2 Dev Journal 
 
-Welcome to page for my ROS 2 Hexapod project! 
+Welcome to my page for the ROS 2 Hexapod project! 
 
 ## About me:
 My name is Orlando Gordillo. I was born in the small town Laredo, Texas. I have a B.S. in Computer Science from the University of Texas at El Paso.
 I have 10 years industry experience doing Robotics Operations and Software Development. 
 
-I've always been curious to learn about ROS and I've now, at the ripe age of 36 😂 have started my journey.
-My goals are to contribute to the fast growing world of humanoid robotics and their intergration into our everyday lives.
-
-## ROS2 implementation of Freenove Big Hexapod Project:
-
-Here, I'll post updates, videos, and technical deep dives as I work on the robot. 
+I've always been curious to learn about ROS and I've now officially started my journey.
+My personal goal is to contribute to the fast growing world of humanoid robotics and their intergration into our everyday lives. I know this robot is not exactly humanioid or humanoid-ish, but this Hexapod is a start and I hope the lessons here translate to the more advanced robotics projects I hope to undertake. 
  
 ---
 
-## Progress and Journal Entries
+## Follow My Progress through Journal Posts
+
+In my posts I'll include updates, videos, and technical deep dives as I work on the robot. 
 
 <ul>
   {% for post in site.posts %}
     <li>
-      <a href="{{ post.url | relative_url }}">{{ post.title }}</a> - <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a> - <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
     </li>
   {% endfor %}
 </ul>
