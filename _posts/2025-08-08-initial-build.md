@@ -10,15 +10,13 @@ Since I was a teenager, I've always really wanted to learn ROS. I've installed i
 
 For now, check out this 2-minute time lapse of the 6 hours it took me to build the robot. 
 
-<div class="responsive-youtube-short">
-  <iframe
-    src="https://www.youtube.com/embed/UhZJ0yrpg-4"
-    title="YouTube video player"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-    allowfullscreen>
-  </iframe>
-</div>
+<iframe
+  src="https://www.youtube.com/embed/UhZJ0yrpg-4"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowfullscreen>
+</iframe>
 
 ### Next Steps
 Think about how I'm going to design and implement a ROS network of components. My spidey senses are telling me I'll need ROS Foxy because of the jetson tx2 being EOL and I'll probably want to use docker on everything to keep things repeatable and swappable. Stay tuned for the next one!
