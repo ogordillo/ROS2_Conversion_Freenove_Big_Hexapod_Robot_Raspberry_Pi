@@ -21,7 +21,12 @@ In my posts I'll include updates, videos, and technical deep dives as I work on 
 <ul>
   {% for post in site.posts %}
     <li>
-        <a href="{{ post.url | relative_url }}">{{ post.title }}</a> - <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+      {% if post.thumbnail %}
+        <a href="{{ post.url | relative_url }}">
+          <img src="{{ post.thumbnail | relative_url }}" alt="{{ post.title }}" class="post-thumbnail">
+        </a>
+      {% endif %}
+      <a href="{{ post.url | relative_url }}">{{ post.title }}</a> - <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
     </li>
   {% endfor %}
 </ul>
