@@ -1,7 +1,8 @@
 ---
 layout: default
-title:  "Week 1 - If you build it, they will come."
+title:  "Week 1 - 💡 If you build it, they will come."
 date:   2025-08-08
+thumbnail: /assets/images/init-build-img.png
 ---
 
 ## Robot Building Montage!
