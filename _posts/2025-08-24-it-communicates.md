@@ -7,7 +7,7 @@ thumbnail: /assets/images/init-depth-img.png
 
 ## 'That came out of Middleware!' (aka DDS Hell)
 
-#### TL;DR; - Setting up the depth stream on WiFi from Pi5 to Laptop was a bit more involved. Eventually it was resolved by choosing to you Zenoh middleware. 
+#### TL;DR; - Setting up the depth stream on WiFi from Pi5 to Laptop was a bit more involved. Eventually it was resolved by choosing Zenoh middleware. 
 
 <iframe
   src="https://www.youtube.com/embed/gR9VG59Kh1E"
@@ -60,7 +60,7 @@ vmSwitch=WSLBridge
 ```
 
 #### VSCode (WSL2) -> Docker
-There is nothing to be done here. It is handed by the WSLBridge we created.
+There is nothing to be done here. It is handeld by the WSLBridge we created.
 
 #### Docker -> ROS Jazzy
 ##### In docker-compose.yml: We want to set the neccessary ROS and Zenoh parameters so you can be discovered by the discovery server.
