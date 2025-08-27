@@ -14,7 +14,7 @@ My personal goal is to contribute to the fast growing world of humanoid robotics
  
 ---
 
-## Follow My Progress through Journal Posts
+## My Project Journal
 
 In my posts I'll include updates, videos, and technical deep dives as I work on the robot. 
 

@@ -89,7 +89,7 @@ ros-jazzy-rmw-zenoh-cpp \
 #### Windows -> VSCode (SSH) -> Raspberry Pi -> Docker
 There is nothing to be done here either. Use RemoteSSH VSCode extension to connect to your Pi's IP
 
-##### Docker -> ROS Jazzy: For this we need to setup a Discovery Server and a Client for our onboard Node. The main point here is that we're using a router_config.yaml file to set up discovery information. We're also getting Zenoh from them directly
+#### Docker -> ROS Jazzy: For this we need to setup a Discovery Server and a Client for our onboard Node. The main point here is that we're using a router_config.yaml file to set up discovery information. We're also getting Zenoh from them directly
 ```
 services:
   zenoh_router:
