@@ -1,5 +1,9 @@
 # ROS2 implementation of Freenove Big Hexapod Robot kit for Raspberry Pi (FNK0052)
 
+## THIS BRANCH IS NO LONGER BEING DEVELOPED - Development stopped due to Foxy/Jetson TX2 being too EOL.
+### Keeping for reference only. 
+
+
 ### Thank you to Freenova
 Firstly, I'd like to thank the ppl at Freenove for being awesome and making applications like this available open source, no strings attached. This is the way. 🙏
 
