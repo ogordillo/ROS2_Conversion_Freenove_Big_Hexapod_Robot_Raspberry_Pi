@@ -43,9 +43,9 @@ My name is Orlando Gordillo. I was born in a small town called Laredo, Texas. I 
 I also have 10 years industry experience with Robotics Operations and Software Development for the Space industry. My main strengths are DevOps and Rapid Prototyping. I believe in diversity, grit, determination, the power of ingenuity, team-work and vision. I value sustainability, recycling, minimizing environmental impacts and helping each other. I hit the gym 3-4 times a week because a healthy mind needs a healthy body. We are all one. 
 
 - "It takes a village to raise a child." - African Proverb
-- "Make food thy medicine and medicine be thy food." - Hippocrates
+- "Make food be thy medicine and medicine be thy food." - Hippocrates
 - "We are made of star stuff" - Carl Sagan
-- "Si, se puede!"
+- "Si, se puede!" - United Farm Workers
 
 ### For Recruiters:
 - [My LinkedIn](https://www.linkedin.com/in/orlando-gordillo-933376a4/)
