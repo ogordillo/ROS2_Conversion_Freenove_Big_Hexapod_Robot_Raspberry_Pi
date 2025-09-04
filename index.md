@@ -1,22 +1,13 @@
 ---
 layout: default
 ---
-# My Hexapod ROS 2 Dev Journal 
+# How to convert the Freenove Hexapod Robot into a ROS2 Robot 🤖 
 
-Welcome to my page for the ROS 2 Hexapod project! 
-
-## About me:
-My name is Orlando Gordillo. I was born in the small town Laredo, Texas. I have a B.S. in Computer Science from the University of Texas at El Paso.
-I have 10 years industry experience doing Robotics Operations and Software Development. 
-
-I've always been curious to learn about ROS and I've now officially started my journey.
-My personal goal is to contribute to the fast growing world of humanoid robotics and their intergration into our everyday lives. I know this robot is not exactly humanioid or even humanoid-ish, but this Hexapod is a start into ROS and distributed Robotics. The lessons here will translate to the more advanced robotics topics I hope to undertake. 
- 
 ---
 
-## My Project Journal
+## Project Blog
 
-In my posts I'll include updates, videos, and technical deep dives as I work on the robot. 
+In my posts I'll include updates, videos, struggles, and technical deep dives as I work through the project. 
 
 <ul>
   {% for post in site.posts %}
@@ -42,9 +33,22 @@ In my posts I'll include updates, videos, and technical deep dives as I work on 
 
 
 ## Parts List:
-Aside from a laptop with Windows 11, these are the parts I'm using. Some of these parts are old, like the jetson tx2, and this is because I wanted to use what I had instead of going out to buy something new.
+- Windows 11 Pro (pro is needed for HyperV) /w WSL2
 - [Freenove Big Hexapod FNK0052 - Amazon Link](https://amzn.to/47vyFz6)
 - [Raspberry Pi 5 - Amazon Link](https://amzn.to/45EQbOT)
-- [Nvidia Jetson TX2 - Amazon Link](https://amzn.to/3JlThQk)
-- [Jetson TX2 Orbitty Carrier Board - Vendor Link](https://www.google.com/url?sa=j&url=https%3A%2F%2Fconnecttech.com%2Fproduct%2Forbitty-carrier-for-nvidia-jetson-tx2-tx1%2F&uct=1750005445&usg=oWNIqRq9dAVoZOkQFAXqlN4Yqbw.&opi=73833047&source=chat)
 - [Intel Realsense Depth Camera D435 - Amazon Link](https://amzn.to/46X4d0F)
+
+## About me:
+My name is Orlando Gordillo. I was born in a small town called Laredo, Texas. I have a B.S. in Computer Science from the University of Texas at El Paso.
+I also have 10 years industry experience with Robotics Operations and Software Development for the Space industry. My main strengths are DevOps and Rapid Prototyping. I believe in diversity, grit, determination, the power of ingenuity, team-work and vision. I value sustainability, recycling, minimizing environmental impacts and helping each other. I hit the gym 3-4 times a week because a healthy mind needs a healthy body. We are all one. 
+
+- "It takes a village to raise a child." - African Proverb
+- "Make food thy medicine and medicine be thy food." - Hippocrates
+- "We are made of star stuff" - Carl Sagan
+- "Si, se puede!"
+
+### For Recruiters:
+- [My LinkedIn](https://www.linkedin.com/in/orlando-gordillo-933376a4/)
+- [My Resume](https://drive.google.com/file/d/158RF4BewtNTz6CmujgvbqKpIV2s55kuR/view?usp=sharing)
+- [My DevPost](https://devpost.com/OrlyGordo)
+- [My Github](https://github.com/ogordillo/ROS2_Conversion_Freenove_Big_Hexapod_Robot_Raspberry_Pi/tree/jazzy-develop/)
