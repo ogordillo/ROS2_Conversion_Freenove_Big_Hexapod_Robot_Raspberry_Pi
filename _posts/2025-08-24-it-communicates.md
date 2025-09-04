@@ -1,6 +1,6 @@
 ---
 layout: default
-title:  "Week 3b - 🌊 Setting up the Stream"
+title:  "Week 3b - 🌊 Pivot to Depth Sensor on the Pi, Choosing a Middleware, Setup of Depth Stream over WiFi"
 date:   2025-08-20
 thumbnail: /assets/images/init-depth-img.png
 ---

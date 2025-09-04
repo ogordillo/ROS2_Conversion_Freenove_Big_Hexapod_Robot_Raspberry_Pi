@@ -1,6 +1,6 @@
 ---
 layout: default
-title:  "Week 5a - 👾 Attack of the Clones!"
+title:  "Week 5a - 👾 Successful Digital Twin in RViz and Gazebo"
 date:   2025-09-04
 thumbnail: /assets/images/rviz_init.png
 ---

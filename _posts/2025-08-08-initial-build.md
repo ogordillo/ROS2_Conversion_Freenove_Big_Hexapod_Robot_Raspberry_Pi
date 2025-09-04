@@ -1,6 +1,6 @@
 ---
 layout: default
-title:  "Week 1 - 💡 If you build it, they will come."
+title:  "Week 1 - 💡 Motivation, Building, and Testing the Robot Kit"
 date:   2025-08-08
 thumbnail: /assets/images/init-build-img.png
 ---
