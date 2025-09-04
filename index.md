@@ -6,7 +6,7 @@ layout: default
 ---
 ## About This Project:
 - Creating a Digital Twin with Fusion360
-- Create a ROS2 Jazzy distributed project to leverage different resources (think GPUs, Databases, Sensors, etc.)
+- Develop a distributed network to leverage remote resources (think GPUs, Databases, Sensors, etc.)
 - Implement Forward/Inverse Kinematics, GAITS, PIDs in Python
 - Implementing SLAM for Path Planning
 - Implement AI models for object avoidance, obstacle climbing.
