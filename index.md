@@ -1,7 +1,7 @@
 ---
 layout: default
 ---
-# Converting the Freenove (FNK0052) Hexapod Robot Kit into a ROS2 Robotics Software Engineering Learning Project.
+# Converting the Freenove (FNK0052) Hexapod Robot Kit into a ROS2 Learning Project.
 
 ---
 ## About This Project:
