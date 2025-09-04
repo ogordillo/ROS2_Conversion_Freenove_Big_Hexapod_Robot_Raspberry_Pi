@@ -1,9 +1,17 @@
 ---
 layout: default
 ---
-# How to convert the Freenove Hexapod Robot into a ROS2 Robot 🤖 
+# Converting the Freenove (FNK0052) Hexapod Robot Kit into a ROS2 Robotics Software Engineering Learning Project.
 
 ---
+## About This Project:
+- Creating a Digital Twin with Fusion360
+- Create a ROS2 Jazzy distributed project to leverage different resources (think GPUs, Databases, Sensors, etc.)
+- Implement Forward/Inverse Kinematics, GAITS, PIDs in Python
+- Implementing SLAM for Path Planning
+- Implement AI models for object avoidance, obstacle climbing.
+- Implement a Gazebo Simulation environment to train AI models.
+- Modify the Robot with additional power resources and sensors.
 
 ## Project Blog
 
