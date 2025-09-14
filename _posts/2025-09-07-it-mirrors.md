@@ -28,13 +28,11 @@ docker-compose up windows_command
 Then on a diff terminal:
 ```
 docker exec -it windows_command bash
-source /opt/ros/jazzy/setup.py
-source install/setup.py # There is currently something unconfigured that we need to source this again
 ```
 
 ##### RViz launch cmd
 ```
-ros2 launch Hexapod_Robot_description display.launch.py
+source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch hexapod_model_description display.launch.py
 ```
 ![rviz-init-img]({{ '/assets/images/rviz_init.png' | relative_url }})
 
@@ -47,7 +45,7 @@ My concern is the init position might be a pain in the but if I don't nail it do
 
 ##### Gazebo launch cmd
 ```
-ros2 launch Hexapod_Robot_description gazebo.launch.py
+source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch hexapod_model_description gazebo.launch.py
 ```
 ![gazebo-init-img]({{ '/assets/images/gazebo_init.png' | relative_url }})
 
