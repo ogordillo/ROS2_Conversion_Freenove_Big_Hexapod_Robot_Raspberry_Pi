@@ -17,8 +17,6 @@ RUN apt-get install -y \
     chrony \
     git \
     python3-pip \
-    python3-opencv \
-    python3-pyqt5 \
     python3-rosdep \
     iputils-ping \
     iproute2  \
@@ -27,6 +25,12 @@ RUN apt-get install -y \
     gnupg \
     ntpdate \
     netcat-openbsd \
+    && apt-get clean
+
+RUN apt-get update && apt-get install -y \
+    libgtkmm-3.0-dev \
+    libopencv-dev \
+    pkg-config \
     && apt-get clean
 
 RUN apt-get install -y \

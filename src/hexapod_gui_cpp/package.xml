@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>hexapod_gui_cpp</name>
+  <version>0.0.1</version>
+  <description>ROS2 node to command the Hexpod robot via windows</description>
+  <maintainer email="ogordillo@miners.utep.edu">Orlando E. Gordillo</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>builtin_interfaces</depend>
+  <depend>robot_interfaces</depend> <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>tf2</depend>
+  <depend>tf2_geometry_msgs</depend>
+
+  <build_depend>pkg-config</build_depend>
+
+  <exec_depend>libgtkmm-3.0-dev</exec_depend>
+  <exec_depend>libopencv-dev</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

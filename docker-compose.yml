@@ -44,4 +44,6 @@ services:
       - ./config/client_config.yaml:/root/config/client.yaml
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ./src:/root/ros2_ws/src
-    command: ["bash", "-c", "ntpdate pool.ntp.org && source /opt/ros/jazzy/setup.bash && colcon build && source install/setup.bash && ros2 launch windows_command window_launch.py"]
+    command: tail -f /dev/null
+    # command: ["bash", "-c", "ntpdate pool.ntp.org && source /opt/ros/jazzy/setup.bash && colcon build && source install/setup.bash && ros2 launch windows_command window_launch.py"]
+    # command: ["bash", "-c", "ntpdate pool.ntp.org && source /opt/ros/jazzy/setup.bash && colcon build && source install/setup.bash && /root/ros2_ws/install/hexapod_gui_cpp/lib/hexapod_gui_cpp/hexapod_gui_main"]
