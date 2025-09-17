@@ -4,7 +4,6 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile.gazebo
     network_mode: "host"
-    privileged: true
     restart: unless-stopped
     environment:
       - DISPLAY=${DISPLAY}
@@ -20,46 +19,53 @@ services:
       - ./config/realsense_params.yaml:/root/ros2_ws/install/pi_control/share/pi_control/config/realsense_params.yaml
 
   zenoh-bridge:
-    image: eclipse/zenoh-bridge-ros2dds:latest
     container_name: zenoh-bridge
-    command: zenohd
+    image: eclipse/zenoh-bridge-ros2dds:latest
+    command: zenohd -c /root/config/router.yaml
     network_mode: "host"
     restart: unless-stopped
+    volumes:
+      # Mount the router config
+      - ./config/router_config.yaml:/root/config/router.yaml
 
   pi_control:
     <<: *ros-service
+    container_name: pi_control
+    image: hexapod_pi_ros_py_img:latest
     depends_on:
       - zenoh-bridge
     build:
       context: .
       dockerfile: ./docker/Dockerfile.pi
-    image: hexbot_pi_ros_img:latest
-    container_name: pi_control
     privileged: true 
       
 
   gazebo:
-    <<: *ros-service # Inherit common properties
+    <<: *ros-service
     container_name: gazebo
+    image: hexapod_gz_ros_img:latest
     depends_on:
       - zenoh-bridge
-    # environment:
-    #   - RUST_LOG=zenoh=fatal,zenoh_transport=fatal
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.gazebo
+    privileged: true 
     command: tail -f /dev/null
 
   rviz:
-    <<: *ros-service # Inherit common properties
+    <<: *ros-service
     container_name: rviz
+    image: hexapod_gz_ros_img:latest
     depends_on:
       - gazebo
     command: tail -f /dev/null
 
   command:
-    <<: *ros-service # Inherit common properties
+    <<: *ros-service
+    container_name: command
+    image: hexapod_cmd_ros_py_img:latest
     build:
       context: .
       dockerfile: ./docker/Dockerfile.wsl
-    container_name: command
-    depends_on:
-      - gazebo
+    privileged: true
     command: tail -f /dev/null
