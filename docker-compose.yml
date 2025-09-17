@@ -16,39 +16,46 @@ services:
       - ./config/client_config.yaml:/root/config/client.yaml
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ./src:/root/ros2_ws/src
-      - ./config/realsense_params.yaml:/root/ros2_ws/install/pi_control/share/pi_control/config/realsense_params.yaml
 
-  # zenoh-bridge:
-  #   container_name: zenoh-bridge
-  #   image: eclipse/zenoh-bridge-ros2dds:latest
-  #   command: zenohd -c /root/config/router.yaml
-  #   network_mode: "host"
-  #   restart: unless-stopped
-  #   volumes:
-  #     # Mount the router config
-  #     - ./config/router_config.yaml:/root/config/router.yaml
-
-  zenoh_router:
-    image: eclipse/zenoh:1.5.0-21-gb222944cb
-    container_name: zenoh_router
+  zenoh-bridge:
+    container_name: zenoh-bridge
+    image: eclipse/zenoh-bridge-ros2dds:latest
+    command: zenohd -c /root/config/router.yaml
     # network_mode: host  <-- REMOVE THIS LINE
     ports:               # <-- ADD THIS SECTION
       - "7447:7447/tcp"
       - "7447:7447/udp"
+    restart: unless-stopped
     volumes:
-      - ./config/router_config.yaml:/etc/zenoh/router.yaml:ro
-    command: --config /etc/zenoh/router.yaml
+      # Mount the router config
+      - ./config/router_config.yaml:/root/config/router.yaml
+
+  # zenoh_router:
+  #   image: eclipse/zenoh:1.5.0-21-gb222944cb
+  #   container_name: zenoh_router
+  #   # network_mode: host  <-- REMOVE THIS LINE
+  #   ports:               # <-- ADD THIS SECTION
+  #     - "7447:7447/tcp"
+  #     - "7447:7447/udp"
+  #   volumes:
+  #     - ./config/router_config.yaml:/etc/zenoh/router.yaml:ro
+  #   command: --config /etc/zenoh/router.yaml
+    
 
   pi_control:
     <<: *ros-service
     container_name: pi_control
     image: hexapod_pi_ros_py_img:latest
     depends_on:
-      - zenoh_router
+      - zenoh_bridge
     build:
       context: .
       dockerfile: ./docker/Dockerfile.pi
     privileged: true 
+    volumes:
+      - ./config/client_config.yaml:/root/config/client.yaml
+      - ./src:/root/ros2_ws/src
+      - ./config/realsense_params.yaml:/root/ros2_ws/install/pi_control/share/pi_control/config/realsense_params.yaml
       
 
   gazebo:
@@ -56,7 +63,7 @@ services:
     container_name: gazebo
     image: hexapod_gz_ros_img:latest
     depends_on:
-      - zenoh_router
+      - zenoh_bridge
     build:
       context: .
       dockerfile: ./docker/Dockerfile.gazebo
