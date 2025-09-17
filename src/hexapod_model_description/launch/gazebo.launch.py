@@ -14,16 +14,17 @@ def generate_launch_description():
     pkg_hexapod_description = get_package_share_directory('hexapod_model_description')
     
     ros_gz_bridge_config = os.path.join(pkg_hexapod_description, 'config', 'ros_gz_bridge_gazebo.yaml')
+    gui_config_path = os.path.join(pkg_hexapod_description, "config", "gui.config")
     robot_description_file = os.path.join(pkg_hexapod_description, 'urdf', 'hexapod_model.xacro')
     robot_description_config = xacro.process_file(robot_description_file)
-
-    # world_file = os.path.join(pkg_hexapod_description, 'worlds', 'hexapod_world.sdf')
+    world_file = os.path.join(pkg_hexapod_description, 'worlds', 'hexapod_world.sdf')
+    
     
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')
         ),
-        launch_arguments={'gz_args': '-r -v 4 empty.sdf'}.items(),
+        launch_arguments={'gz_args': [f'-r -v 4 --gui-config ', gui_config_path, world_file]}.items(),
     )
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
