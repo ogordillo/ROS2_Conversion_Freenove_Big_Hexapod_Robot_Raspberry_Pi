@@ -16,7 +16,7 @@ Features:
 - Video stream display for color and depth cameras.
 - ROS2 communication (services, topics) handled in a non-blocking background thread.
 - Publishes JointState messages for visualization in RViz2.
-- Publishes Float64MultiArray messages for Gazebo simulation control when 'Sim' mode is enabled.
+- Publishes JointTrajectory messages for Gazebo simulation control when 'Sim' mode is enabled.
 """
 
 import sys
@@ -27,8 +27,8 @@ import numpy as np
 import math
 from rclpy.node import Node
 from functools import partial
-import yaml  # MODIFICATION: Added for YAML handling
-import os    # MODIFICATION: Added for path handling
+import yaml
+import os
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QLabel, QPushButton, QFrame,
                              QVBoxLayout, QHBoxLayout, QGridLayout, QSlider, QLineEdit,
@@ -45,9 +45,8 @@ from builtin_interfaces.msg import Duration
 from robot_interfaces.srv import SetServo
 
 
-# --- MODIFICATION START: Defined config path as a constant ---
+# --- Defined config path as a constant ---
 ZENOH_CONFIG_PATH = '/root/config/client.yaml'
-# --- MODIFICATION END ---
 
 
 SERVO_CHANNELS = {
@@ -139,12 +138,9 @@ class RosNodeThread(QThread):
 
         # Cleanup
         self.node.destroy_node()
-        # rclpy.shutdown() # Shutdown is now handled in stop() for better control
 
-    # ... (rest of your RosNodeThread methods are unchanged)
     def _imu_callback(self, msg):
         """Processes incoming IMU messages and updates orientation data."""
-        # Convert quaternion to Euler angles (roll, pitch, yaw)
         t0 = +2.0 * (msg.orientation.w * msg.orientation.x + msg.orientation.y * msg.orientation.z)
         t1 = +1.0 - 2.0 * (msg.orientation.x * msg.orientation.x + msg.orientation.y * msg.orientation.y)
         roll_x = math.atan2(t0, t1)
@@ -264,13 +260,11 @@ class RosNodeThread(QThread):
             self.joint_state_pub.publish(rviz_msg)
             
     def stop(self):
-        # Gracefully shut down the rclpy context
         if rclpy.ok():
             rclpy.shutdown()
-        self.wait() # Wait for the QThread.run() method to finish
+        self.wait()
 
 
-# ... (JoystickWidget, HexapodImageCell, LegDisplayWindow, CameraDisplayWindow, IMUDisplayWindow are unchanged)
 class JoystickWidget(QWidget):
     """ A simple visual placeholder for a joystick. """
     def __init__(self, parent=None):
@@ -534,8 +528,9 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 100, 1000, 800)
         self.setStyleSheet("QFrame { border: 1px solid #aaa; border-radius: 5px; }")
         
-        self.ros_thread = None # MODIFICATION: Initialize as None
+        self.ros_thread = None
         self.secondary_windows = {}
+        self.is_sim_mode = False # MODIFICATION: Added state for sim mode
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -546,7 +541,6 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self._create_bottom_frame())
         
         self._update_connection_status(False)
-        # MODIFICATION: Initial connection on startup
         self._handle_reconnect()
         
 
@@ -561,14 +555,16 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.conn_status_label)
         layout.addWidget(self.conn_status_value)
         
-        self.sim_checkbox = QCheckBox("Sim")
-        self.sim_checkbox.setToolTip("Enable publishing to Gazebo topics")
-        self.sim_checkbox.stateChanged.connect(self._toggle_sim_mode)
-        layout.addWidget(self.sim_checkbox)
+        # --- MODIFICATION START: Replaced QCheckBox with QPushButton for toggling mode ---
+        self.mode_toggle_button = QPushButton("Mode: Real Hexapod")
+        self.mode_toggle_button.setCheckable(True)
+        self.mode_toggle_button.toggled.connect(self._toggle_sim_mode)
+        self.mode_toggle_button.setToolTip("Toggle between controlling the real robot and the Gazebo simulation.")
+        layout.addWidget(self.mode_toggle_button)
+        # --- MODIFICATION END ---
         
-        # --- MODIFICATION START: Added IP input field and connect button ---
         layout.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Fixed, QSizePolicy.Minimum))
-        self.ip_address_label = QLabel("Router IP:")
+        self.ip_address_label = QLabel("Target IP:") # MODIFICATION: Changed label for clarity
         self.ip_address_input = QLineEdit("localhost")
         self.ip_address_input.setFixedWidth(150)
         self.connect_button = QPushButton("Connect")
@@ -577,7 +573,6 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.ip_address_label)
         layout.addWidget(self.ip_address_input)
         layout.addWidget(self.connect_button)
-        # --- MODIFICATION END ---
         
         layout.addStretch()
         self.batt1_level_label = QLabel("Battery1:")
@@ -592,7 +587,6 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.batt2_level_value)
         return frame
 
-    # ... (_create_middle_frame and _create_bottom_frame are unchanged)
     def _create_middle_frame(self):
         frame = QFrame()
         self.grid_layout = QGridLayout(frame)
@@ -684,13 +678,25 @@ class MainWindow(QMainWindow):
             button.clicked.connect(self._open_imu_display_handler)
         return button
 
-    def _toggle_sim_mode(self, state):
-        """Passes the checkbox state to the ROS thread."""
+    # --- MODIFICATION START: Updated toggle and connection logic ---
+    def _toggle_sim_mode(self, checked):
+        """Toggles the control mode between Real and Simulation."""
+        self.is_sim_mode = checked
+        if self.is_sim_mode:
+            self.mode_toggle_button.setText("Mode: Gazebo Sim")
+            self.ip_address_input.setText("localhost") # Default for local sim
+        else:
+            self.mode_toggle_button.setText("Mode: Real Hexapod")
+            # You might want to set a default robot IP here
+            # self.ip_address_input.setText("192.168.0.1") 
+            
         if self.ros_thread and self.ros_thread.isRunning():
-            is_checked = (state == Qt.Checked)
-            self.ros_thread.set_sim_mode(is_checked)
-    
-    # --- MODIFICATION START: New methods for reconnection ---
+            self.ros_thread.set_sim_mode(self.is_sim_mode)
+        
+        # Force a connection status update to reflect the new mode text
+        current_status_is_connected = "Offline" not in self.conn_status_value.text()
+        self._update_connection_status(current_status_is_connected)
+
     def _update_zenoh_config(self, ip_address):
         """Writes the provided IP address to the Zenoh config file."""
         config_data = {
@@ -699,10 +705,13 @@ class MainWindow(QMainWindow):
                     f'udp/{ip_address}:7447',
                     f'tcp/{ip_address}:7447'
                 ]
+            },
+            'timestamping':{
+                'enabled': True,
+                'drop_future_timestamp': True
             }
         }
         try:
-            # Ensure the directory exists
             config_dir = os.path.dirname(ZENOH_CONFIG_PATH)
             if not os.path.exists(config_dir):
                 os.makedirs(config_dir)
@@ -714,30 +723,25 @@ class MainWindow(QMainWindow):
             return True
         except (IOError, PermissionError) as e:
             print(f"Error writing to Zenoh config file '{ZENOH_CONFIG_PATH}': {e}")
-            # Optionally, show an error message to the user here
             return False
 
     def _handle_reconnect(self):
         """Orchestrates the shutdown and restart of the ROS thread."""
         print("Attempting to reconnect...")
-        self._update_connection_status(False)
+        self._update_connection_status(False) # Show offline status initially
         self.conn_status_value.setText("Connecting...")
-        self.conn_status_value.setStyleSheet("color: #FFC107;") # Yellow for connecting
+        self.conn_status_value.setStyleSheet("color: #FFC107;") # Yellow
 
-        # 1. Close all secondary windows
         for window in self.secondary_windows.values():
             window.close()
         self.secondary_windows.clear()
 
-        # 2. Stop the current ROS thread if it's running
         if self.ros_thread and self.ros_thread.isRunning():
             print("Stopping existing ROS thread...")
-            # Disconnect old signals to prevent issues
             self.ros_thread.telemetry_update_signal.disconnect(self._update_telemetry_display)
             self.ros_thread.stop()
             print("ROS thread stopped.")
 
-        # 3. Get IP and update the config file
         ip = self.ip_address_input.text().strip()
         if not ip:
             print("IP address cannot be empty.")
@@ -750,17 +754,13 @@ class MainWindow(QMainWindow):
             self.conn_status_value.setStyleSheet("color: #F44336;")
             return
 
-        # 4. Start a new ROS thread
         print("Starting new ROS thread...")
         self.ros_thread = RosNodeThread()
-        # Re-apply the sim mode state from the checkbox
-        self.ros_thread.set_sim_mode(self.sim_checkbox.isChecked())
+        self.ros_thread.set_sim_mode(self.is_sim_mode) # Apply current mode
         
-        # 5. Reconnect signals
         self.ros_thread.telemetry_update_signal.connect(self._update_telemetry_display)
         self.ros_thread.start()
         print("New ROS thread started.")
-    # --- MODIFICATION END ---
     
     @pyqtSlot(dict)
     def _update_telemetry_display(self, telemetry_data):
@@ -792,14 +792,21 @@ class MainWindow(QMainWindow):
                 elif component == 'camera':
                     self.cam_value_labels.value_labels[joint].setText(display_text)
 
-
     def _update_connection_status(self, connected):
+        """Updates the status label based on connection status and current mode."""
+        if self.is_sim_mode:
+            status_text = "Gazebo Online" if connected else "Gazebo Offline"
+        else:
+            status_text = "Hardware Online" if connected else "Hardware Offline"
+
+        self.conn_status_value.setText(status_text)
+        
         if connected:
-            self.conn_status_value.setText("Connected")
             self.conn_status_value.setStyleSheet("color: #4CAF50;") # Green
         else:
-            self.conn_status_value.setText("Disconnected")
             self.conn_status_value.setStyleSheet("color: #F44336;") # Red
+
+    # --- MODIFICATION END ---
 
     def _update_battery1_level(self, level):
         self.batt1_level_value.setText(f"{level}%")
@@ -814,7 +821,6 @@ class MainWindow(QMainWindow):
     def _open_leg_display_handler(self, leg_number):
         win_id = f"leg_{leg_number}"
         if win_id not in self.secondary_windows or not self.secondary_windows[win_id].isVisible():
-            # MODIFICATION: Pass the current ros_thread object
             if self.ros_thread and self.ros_thread.isRunning():
                 leg_name = f"Leg {leg_number}"
                 self.secondary_windows[win_id] = LegDisplayWindow(leg_name, self.ros_thread)
@@ -825,7 +831,6 @@ class MainWindow(QMainWindow):
     def _open_camera_display_handler(self):
         win_id = "camera"
         if win_id not in self.secondary_windows or not self.secondary_windows[win_id].isVisible():
-            # MODIFICATION: Pass the current ros_thread object
             if self.ros_thread and self.ros_thread.isRunning():
                 self.secondary_windows[win_id] = CameraDisplayWindow(self.ros_thread)
                 self.secondary_windows[win_id].show()
@@ -835,7 +840,6 @@ class MainWindow(QMainWindow):
     def _open_imu_display_handler(self):
         win_id = "imu"
         if win_id not in self.secondary_windows or not self.secondary_windows[win_id].isVisible():
-            # MODIFICATION: Pass the current ros_thread object
             if self.ros_thread and self.ros_thread.isRunning():
                 self.secondary_windows[win_id] = IMUDisplayWindow(self.ros_thread)
                 self.secondary_windows[win_id].show()
@@ -847,7 +851,6 @@ class MainWindow(QMainWindow):
         for window in self.secondary_windows.values():
             window.close()
         
-        # MODIFICATION: Ensure thread is stopped correctly on close
         if self.ros_thread and self.ros_thread.isRunning():
             self.ros_thread.stop()
             

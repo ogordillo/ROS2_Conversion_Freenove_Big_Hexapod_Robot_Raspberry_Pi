@@ -1,7 +1,7 @@
 connect:
   endpoints:
-  - udp/localhost:7447
-  - tcp/localhost:7447
+  - udp/10.0.0.118:7447
+  - tcp/10.0.0.118:7447
 
 timestamping:
   enabled: true
