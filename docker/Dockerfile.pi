@@ -66,12 +66,13 @@ RUN . /opt/ros/${DISTRO}/setup.sh && \
     rosdep init && rosdep update && \
     rosdep install -i --from-path src --rosdistro ${DISTRO} -y
 
+RUN sudo ln -s /usr/include/eigen3/Eigen /usr/include/Eigen
+
 WORKDIR /root/ros2_ws
 
 RUN echo "source /opt/ros/${DISTRO}/setup.bash" >> ~/.bashrc
-RUN echo "source /root/ros2_ws/install/setup.bash" >> ~/.bashrc
-
-RUN sudo ln -s /usr/include/eigen3/Eigen /usr/include/Eigen
+RUN echo "alias control-hexapod='colcon build && source install/setup.bash && (fastdds discovery -i 0 &) && ros2 launch pi_control robot_launch.py'" >> ~/.bashrc
 
 
-CMD ["/bin/bash", "-c", "ntpdate pool.ntp.org && source /opt/ros/jazzy/setup.bash && colcon build && source install/setup.bash && (fastdds discovery -i 0 &) && ros2 launch pi_control robot_launch.py"]
+
+# CMD ["/bin/bash", "-c", "ntpdate pool.ntp.org && source /opt/ros/jazzy/setup.bash && colcon build && source install/setup.bash && (fastdds discovery -i 0 &) && ros2 launch pi_control robot_launch.py"]

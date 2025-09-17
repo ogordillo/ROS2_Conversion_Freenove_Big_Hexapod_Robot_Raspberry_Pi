@@ -12,7 +12,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -33,7 +32,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg1_coxa_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.074015 0.054485 -0.072913" rpy="0 0 0"/>
@@ -54,7 +52,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg1_femur_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.093074 0.0848 -0.031513" rpy="0 0 0"/>
@@ -75,7 +72,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg1_tibia_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.166798 0.136421 -0.031513" rpy="0 0 0"/>
@@ -96,7 +92,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg2_coxa_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.001985 0.084485 -0.072913" rpy="0 0 0"/>
@@ -117,7 +112,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg2_femur_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.015885 0.117485 -0.031513" rpy="0 0 0"/>
@@ -138,7 +132,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg2_tibia_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.015885 0.205868 -0.014528" rpy="0 0 0"/>
@@ -159,7 +152,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg3_coxa_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.077985 0.054485 -0.072913" rpy="0 0 0"/>
@@ -180,7 +172,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg3_femur_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.1122 0.065049 -0.031513" rpy="0 0 0"/>
@@ -201,7 +192,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg3_tibia_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.181144 0.1229 -0.031513" rpy="0 0 0"/>
@@ -222,7 +212,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg4_coxa_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.077985 -0.055515 -0.072913" rpy="0 0 0"/>
@@ -243,7 +232,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg4_femur_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.1122 -0.066079 -0.031513" rpy="0 0 0"/>
@@ -264,7 +252,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg4_tibia_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.181144 -0.12393 -0.031513" rpy="0 0 0"/>
@@ -285,7 +272,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg5_coxa_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.001985 -0.085515 -0.072913" rpy="0 0 0"/>
@@ -306,7 +292,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg5_femur_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.015885 -0.118515 -0.031513" rpy="0 0 0"/>
@@ -327,7 +312,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg5_tibia_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.015885 -0.208504 -0.032892" rpy="0 0 0"/>
@@ -348,7 +332,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg6_coxa_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.074015 -0.055515 -0.072913" rpy="0 0 0"/>
@@ -369,7 +352,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg6_femur_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.093074 -0.085829 -0.031513" rpy="0 0 0"/>
@@ -390,7 +372,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/leg6_tibia_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.166798 -0.137451 -0.031513" rpy="0 0 0"/>
@@ -411,7 +392,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/neck_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.081015 -0.000515 -0.079313" rpy="0 0 0"/>
@@ -432,7 +412,6 @@
       <geometry>
         <mesh filename="file://$(find hexapod_model_description)/meshes/face_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.091415 0.019185 -0.120913" rpy="0 0 0"/>

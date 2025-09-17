@@ -1,62 +1,45 @@
-FROM ros:jazzy-ros-base
+# docker/Dockerfile.wsl
 
-ARG DISTRO=jazzy
-ARG GZ_VERSION=harmonic
+FROM ros:jazzy-ros-base
 
 SHELL ["/bin/bash", "-c"]
 
+ARG DISTRO=jazzy
 ENV DEBIAN_FRONTEND=noninteractive
-ENV GZ_VERSION=${GZ_VERSION}
-ENV GZ_SIM_SYSTEM_PLUGIN_PATH="/opt/ros/${DISTRO}/lib"
 
-RUN apt-get update 
-
-RUN apt-get install -y \
+# Install core and GUI tool dependencies
+RUN apt-get update && apt-get install -y \
     build-essential \
     pipx \
-    chrony \
     git \
     python3-pip \
     python3-opencv \
     python3-pyqt5 \
-    python3-rosdep \
+    python3-yaml \
     iputils-ping \
-    iproute2  \
+    iproute2 \
     curl \
-    lsb-release \ 
+    lsb-release \
     gnupg \
-    ntpdate \
-    netcat-openbsd \
     && apt-get clean
 
-RUN apt-get install -y \
-    ros-${DISTRO}-ros-gz \
-    ros-${DISTRO}-ros-gz-sim \
+# Install ROS tools and Zenoh RMW
+RUN apt-get update && apt-get install -y \
     ros-${DISTRO}-cv-bridge \
-    ros-${DISTRO}-rmw-zenoh-cpp \
-    ros-${DISTRO}-ros2-control \
-    ros-${DISTRO}-ros2-controllers \
-    ros-${DISTRO}-gz-ros2-control \ 
-    ros-${DISTRO}-rviz2 \
     ros-${DISTRO}-plotjuggler \
     ros-${DISTRO}-plotjuggler-ros \
     ros-${DISTRO}-joint-state-publisher \
     ros-${DISTRO}-joint-state-publisher-gui \
-    ros-${DISTRO}-rosbag2-storage-mcap \
     ros-${DISTRO}-teleop-twist-joy \
     ros-${DISTRO}-joy \
-    ros-${DISTRO}-pinocchio \
     ros-${DISTRO}-xacro \
+    ros-${DISTRO}-rmw-zenoh-cpp \
     && rm -rf /var/lib/apt/lists/*
 
+# Set up ROS 2 workspace
 WORKDIR /root/ros2_ws
-
-RUN echo "source /opt/ros/${DISTRO}/setup.bash" >> ~/.bashrc
-RUN echo "source /root/ros2_ws/install/setup.bash" >> ~/.bashrc
-RUN echo "alias gazebo_hexapod='ros2 launch hexapod_model_description gazebo.launch.py'" >> ~/.bashrc
-RUN echo "alias rviz_hexapod='ros2 launch hexapod_model_description display.launch.py'" >> ~/.bashrc
-
-
-RUN sudo ln -s /usr/include/eigen3/Eigen /usr/include/Eigen
-
 COPY ./src ./src
+
+# Source ROS environment and add aliases
+RUN echo "source /opt/ros/${DISTRO}/setup.bash" >> ~/.bashrc
+RUN echo "alias command-hexapod='colcon build && source install/setup.bash && ros2 launch windows_command command.launch.py'" >> ~/.bashrc

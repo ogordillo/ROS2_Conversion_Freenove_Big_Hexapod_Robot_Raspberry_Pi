@@ -27,20 +27,27 @@ import numpy as np
 import math
 from rclpy.node import Node
 from functools import partial
+import yaml  # MODIFICATION: Added for YAML handling
+import os    # MODIFICATION: Added for path handling
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QLabel, QPushButton, QFrame,
                              QVBoxLayout, QHBoxLayout, QGridLayout, QSlider, QLineEdit,
                              QListWidget, QAbstractItemView, QSizePolicy,
-                             QSpacerItem, QCheckBox) # Added QCheckBox
+                             QSpacerItem, QCheckBox)
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QSize, QTimer
 from PyQt5.QtGui import QImage, QPixmap, QColor, QFont, QPainter, QPen, QBrush, QDoubleValidator
 
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, JointState, BatteryState, Imu
-from std_msgs.msg import Float64MultiArray # Added for Gazebo
+from std_msgs.msg import Float64MultiArray
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from builtin_interfaces.msg import Duration
 from robot_interfaces.srv import SetServo
+
+
+# --- MODIFICATION START: Defined config path as a constant ---
+ZENOH_CONFIG_PATH = '/root/config/client.yaml'
+# --- MODIFICATION END ---
 
 
 SERVO_CHANNELS = {
@@ -68,10 +75,9 @@ RVIZ_JOINT_NAMES = {
     'camera': {'pan': 'camera_pan_joint', 'tilt': 'camera_tilt_joint'},
 }
 
-# A canonical, ordered list of all joint names. Used for Gazebo publishing.
 all_rviz_joint_names = [
     rviz_name
-    for component in ['leg1', 'leg2', 'leg3', 'leg4', 'leg5', 'leg6', 'camera'] # Ensure consistent order
+    for component in ['leg1', 'leg2', 'leg3', 'leg4', 'leg5', 'leg6', 'camera']
     for rviz_name in RVIZ_JOINT_NAMES[component].values()
 ]
 
@@ -87,12 +93,12 @@ for component, joints in RVIZ_JOINT_NAMES.items():
 ROS_TOPICS = {
     'color': '/camera/camera/color/image_raw',
     'depth': '/camera/camera/depth/image_rect_raw',
-    # Added Gazebo command topic
     'gazebo_cmd': '/hexapod_joint_group_controller/command'
 }
 ROS_SERVICES = {
     'set_servo': '/set_servo_angle'
 }
+
 
 class RosNodeThread(QThread):
     """ Manages all ROS2 communications in a background thread """
@@ -106,45 +112,36 @@ class RosNodeThread(QThread):
         self.bridge = CvBridge()
         self.color_sub = None
         self.depth_sub = None
-        # --- MODIFICATION START: Added simulation mode flag ---
         self.sim_mode = False
-        # --- MODIFICATION END ---
 
     def run(self):
-        rclpy.init()
+        # Catch potential init errors if Zenoh router is not available
+        try:
+            rclpy.init()
+        except Exception as e:
+            print(f"Error during rclpy.init(): {e}")
+            self.telemetry_update_signal.emit({'connection': False})
+            return
+
         self.node = rclpy.create_node('hexapod_gui_node')
         self.set_servo_client = self.node.create_client(SetServo, ROS_SERVICES['set_servo'])
         self.joint_state_pub = self.node.create_publisher(JointState, '/joint_states', 10)
-        
         self.gazebo_joint_publisher = self.node.create_publisher(JointTrajectory, '/joint_trajectory_controller/joint_trajectory', 10)
-    
-        self.joint_state_sub = self.node.create_subscription(
-            JointState,
-            'joint_states',
-            self._joint_state_callback,
-            10)
-        self.battery1_sub = self.node.create_subscription(
-            BatteryState,
-            '/battery1_state',
-            self._battery1_callback,
-            10)
-        self.battery2_sub = self.node.create_subscription(
-            BatteryState,
-            '/battery2_state',
-            self._battery2_callback,
-            10)
-        self.imu_sub = self.node.create_subscription(
-            Imu,
-            '/imu/data_raw',
-            self._imu_callback,
-            10)
+        
+        # Subscriptions...
+        self.joint_state_sub = self.node.create_subscription(JointState, 'joint_states', self._joint_state_callback, 10)
+        self.battery1_sub = self.node.create_subscription(BatteryState, '/battery1_state', self._battery1_callback, 10)
+        self.battery2_sub = self.node.create_subscription(BatteryState, '/battery2_state', self._battery2_callback, 10)
+        self.imu_sub = self.node.create_subscription(Imu, '/imu/data_raw', self._imu_callback, 10)
 
         self.node.get_logger().info("Hexapod GUI ROS2 Node is running.")
         rclpy.spin(self.node)
 
+        # Cleanup
         self.node.destroy_node()
-        rclpy.shutdown()
+        # rclpy.shutdown() # Shutdown is now handled in stop() for better control
 
+    # ... (rest of your RosNodeThread methods are unchanged)
     def _imu_callback(self, msg):
         """Processes incoming IMU messages and updates orientation data."""
         # Convert quaternion to Euler angles (roll, pitch, yaw)
@@ -234,42 +231,31 @@ class RosNodeThread(QThread):
         self.set_servo_client.call_async(req)
         self.node.get_logger().info(f"Set servo channel {channel} to {angle} degrees.")
 
-    # --- MODIFICATION START: Added method to toggle sim mode ---
     def set_sim_mode(self, enabled):
         """Sets the simulation mode flag."""
         self.sim_mode = enabled
         if self.node:
             log_msg = "enabled" if enabled else "disabled"
             self.node.get_logger().info(f"Gazebo simulation publishing is {log_msg}.")
-    # --- MODIFICATION END ---
 
     def publish_all_joint_states(self, joint_states_dict):
-        """
-        Creates and publishes messages for RViz and Gazebo.
-        In Sim mode, only publishes commands to Gazebo.
-        In Real mode, only publishes joint states for RViz.
-        """
         if not self.node:
             return
 
-        # 1. If in simulation mode, publish commands for Gazebo controllers
         if self.sim_mode:
             ordered_positions = [joint_states_dict.get(name, 0.0) for name in all_rviz_joint_names]
             
             traj_msg = JointTrajectory()
-            traj_msg.joint_names = all_rviz_joint_names # Use the full list of 20 joints
+            traj_msg.joint_names = all_rviz_joint_names
             
             point = JointTrajectoryPoint()
-            point.positions = ordered_positions # Use the full list of 20 positions
-            point.time_from_start = Duration(sec=1, nanosec=0) # Reduced time for quicker response
+            point.positions = ordered_positions
+            point.time_from_start = Duration(sec=1, nanosec=0)
             
             traj_msg.points.append(point)
             
             self.node.get_logger().info(f'Sending command to move {len(traj_msg.joint_names)} joints.')
             self.gazebo_joint_publisher.publish(traj_msg)
-
-        
-        # 2. If NOT in simulation mode, publish JointState message for RViz visualization
         else:
             rviz_msg = JointState()
             rviz_msg.header.stamp = self.node.get_clock().now().to_msg()
@@ -278,12 +264,13 @@ class RosNodeThread(QThread):
             self.joint_state_pub.publish(rviz_msg)
             
     def stop(self):
-        if self.node and rclpy.ok():
-            if rclpy.ok():
-                rclpy.get_global_executor().shutdown()
-                rclpy.shutdown()
-        self.wait()
+        # Gracefully shut down the rclpy context
+        if rclpy.ok():
+            rclpy.shutdown()
+        self.wait() # Wait for the QThread.run() method to finish
 
+
+# ... (JoystickWidget, HexapodImageCell, LegDisplayWindow, CameraDisplayWindow, IMUDisplayWindow are unchanged)
 class JoystickWidget(QWidget):
     """ A simple visual placeholder for a joystick. """
     def __init__(self, parent=None):
@@ -327,7 +314,6 @@ class HexapodImageCell(QLabel):
         elif self.segment_type == 'rear_left': painter.drawLine(w, 0, cx, cy)
 
 class LegDisplayWindow(QWidget):
-
     def __init__(self, leg_name, ros_node_thread, parent=None):
         super().__init__(parent)
         self.leg_name = leg_name
@@ -388,21 +374,15 @@ class LegDisplayWindow(QWidget):
             self.ros_node.call_set_servo(channel, angle)
         angle_rad = np.deg2rad(angle - 90)
         rviz_joint_name = self.rviz_joints.get(joint_name)
-        # Update the state
         if rviz_joint_name:
             self._joint_states[rviz_joint_name] = angle_rad
-        
-        # Publish all joint states for RViz and Gazebo
         self.ros_node.publish_all_joint_states(self._joint_states)
 
 class CameraDisplayWindow(QWidget):
-
     def __init__(self, ros_node_thread, parent=None):
         super().__init__(parent)
         self.ros_node = ros_node_thread
-        # --- MODIFICATION START: Added joint state tracking for camera ---
         self._joint_states = INITIAL_JOINT_STATES.copy()
-        # --- MODIFICATION END ---
         self.setWindowTitle("Camera Control & Display")
         self.setMinimumSize(1300, 600)
         self.main_layout = QVBoxLayout(self)
@@ -470,13 +450,9 @@ class CameraDisplayWindow(QWidget):
             self.ros_node.call_set_servo(channel, angle)
         angle_rad = np.deg2rad(angle - 90)
         rviz_joint_name = RVIZ_JOINT_NAMES['camera'].get(servo_name)
-
-        # --- MODIFICATION START: Bug fix for camera control publishing ---
-        # This now mirrors the leg control logic for consistency
         if rviz_joint_name:
             self._joint_states[rviz_joint_name] = angle_rad
             self.ros_node.publish_all_joint_states(self._joint_states)
-        # --- MODIFICATION END ---
 
     def _toggle_video_stream(self, stream_type, checked):
         btn = self.color_toggle_btn if stream_type == 'color' else self.depth_toggle_btn
@@ -522,7 +498,6 @@ class CameraDisplayWindow(QWidget):
         super().closeEvent(event)
 
 class IMUDisplayWindow(QWidget):
-
     def __init__(self, ros_node_thread, parent=None):
         super().__init__(parent)
         self.ros_node = ros_node_thread
@@ -558,17 +533,21 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Hexapod Command Node")
         self.setGeometry(100, 100, 1000, 800)
         self.setStyleSheet("QFrame { border: 1px solid #aaa; border-radius: 5px; }")
-        self.ros_thread = RosNodeThread()
-        self.ros_thread.start()
+        
+        self.ros_thread = None # MODIFICATION: Initialize as None
+        self.secondary_windows = {}
+
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.main_layout = QVBoxLayout(self.central_widget)
-        self.secondary_windows = {}
+        
         self.main_layout.addWidget(self._create_top_frame())
         self.main_layout.addWidget(self._create_middle_frame(), stretch=1)
         self.main_layout.addWidget(self._create_bottom_frame())
-        self.ros_thread.telemetry_update_signal.connect(self._update_telemetry_display)
+        
         self._update_connection_status(False)
+        # MODIFICATION: Initial connection on startup
+        self._handle_reconnect()
         
 
     def _create_top_frame(self):
@@ -582,11 +561,22 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.conn_status_label)
         layout.addWidget(self.conn_status_value)
         
-        # --- MODIFICATION START: Added sim checkbox ---
         self.sim_checkbox = QCheckBox("Sim")
         self.sim_checkbox.setToolTip("Enable publishing to Gazebo topics")
         self.sim_checkbox.stateChanged.connect(self._toggle_sim_mode)
         layout.addWidget(self.sim_checkbox)
+        
+        # --- MODIFICATION START: Added IP input field and connect button ---
+        layout.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Fixed, QSizePolicy.Minimum))
+        self.ip_address_label = QLabel("Router IP:")
+        self.ip_address_input = QLineEdit("localhost")
+        self.ip_address_input.setFixedWidth(150)
+        self.connect_button = QPushButton("Connect")
+        self.connect_button.clicked.connect(self._handle_reconnect)
+        
+        layout.addWidget(self.ip_address_label)
+        layout.addWidget(self.ip_address_input)
+        layout.addWidget(self.connect_button)
         # --- MODIFICATION END ---
         
         layout.addStretch()
@@ -602,6 +592,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.batt2_level_value)
         return frame
 
+    # ... (_create_middle_frame and _create_bottom_frame are unchanged)
     def _create_middle_frame(self):
         frame = QFrame()
         self.grid_layout = QGridLayout(frame)
@@ -693,17 +684,86 @@ class MainWindow(QMainWindow):
             button.clicked.connect(self._open_imu_display_handler)
         return button
 
-    # --- MODIFICATION START: Added handler for checkbox ---
     def _toggle_sim_mode(self, state):
         """Passes the checkbox state to the ROS thread."""
-        is_checked = (state == Qt.Checked)
-        self.ros_thread.set_sim_mode(is_checked)
+        if self.ros_thread and self.ros_thread.isRunning():
+            is_checked = (state == Qt.Checked)
+            self.ros_thread.set_sim_mode(is_checked)
+    
+    # --- MODIFICATION START: New methods for reconnection ---
+    def _update_zenoh_config(self, ip_address):
+        """Writes the provided IP address to the Zenoh config file."""
+        config_data = {
+            'connect': {
+                'endpoints': [
+                    f'udp/{ip_address}:7447',
+                    f'tcp/{ip_address}:7447'
+                ]
+            }
+        }
+        try:
+            # Ensure the directory exists
+            config_dir = os.path.dirname(ZENOH_CONFIG_PATH)
+            if not os.path.exists(config_dir):
+                os.makedirs(config_dir)
+                print(f"Created config directory: {config_dir}")
+
+            with open(ZENOH_CONFIG_PATH, 'w') as f:
+                yaml.dump(config_data, f, default_flow_style=False)
+            print(f"Successfully updated Zenoh config with IP: {ip_address}")
+            return True
+        except (IOError, PermissionError) as e:
+            print(f"Error writing to Zenoh config file '{ZENOH_CONFIG_PATH}': {e}")
+            # Optionally, show an error message to the user here
+            return False
+
+    def _handle_reconnect(self):
+        """Orchestrates the shutdown and restart of the ROS thread."""
+        print("Attempting to reconnect...")
+        self._update_connection_status(False)
+        self.conn_status_value.setText("Connecting...")
+        self.conn_status_value.setStyleSheet("color: #FFC107;") # Yellow for connecting
+
+        # 1. Close all secondary windows
+        for window in self.secondary_windows.values():
+            window.close()
+        self.secondary_windows.clear()
+
+        # 2. Stop the current ROS thread if it's running
+        if self.ros_thread and self.ros_thread.isRunning():
+            print("Stopping existing ROS thread...")
+            # Disconnect old signals to prevent issues
+            self.ros_thread.telemetry_update_signal.disconnect(self._update_telemetry_display)
+            self.ros_thread.stop()
+            print("ROS thread stopped.")
+
+        # 3. Get IP and update the config file
+        ip = self.ip_address_input.text().strip()
+        if not ip:
+            print("IP address cannot be empty.")
+            self.conn_status_value.setText("Invalid IP")
+            self.conn_status_value.setStyleSheet("color: #F44336;")
+            return
+            
+        if not self._update_zenoh_config(ip):
+            self.conn_status_value.setText("Config Error")
+            self.conn_status_value.setStyleSheet("color: #F44336;")
+            return
+
+        # 4. Start a new ROS thread
+        print("Starting new ROS thread...")
+        self.ros_thread = RosNodeThread()
+        # Re-apply the sim mode state from the checkbox
+        self.ros_thread.set_sim_mode(self.sim_checkbox.isChecked())
+        
+        # 5. Reconnect signals
+        self.ros_thread.telemetry_update_signal.connect(self._update_telemetry_display)
+        self.ros_thread.start()
+        print("New ROS thread started.")
     # --- MODIFICATION END ---
     
     @pyqtSlot(dict)
     def _update_telemetry_display(self, telemetry_data):
-        """Updates connection status, battery levels, and joint angles based on telemetry data."""
-
         if 'connection' in telemetry_data:
             self._update_connection_status(telemetry_data['connection'])
 
@@ -721,16 +781,12 @@ class MainWindow(QMainWindow):
             self.imu_value_labels.value_labels['yaw'].setText(f"{imu_data['yaw']:.2f}°")
             self.imu_value_labels.value_labels['roll'].setText(f"{imu_data['roll']:.2f}°")
 
-        """Receives telemetry data and updates the GUI labels."""
         for channel, angle in telemetry_data.items():
             if channel in REVERSE_SERVO_MAP:
                 info = REVERSE_SERVO_MAP[channel]
                 component = info['component']
                 joint = info['joint']
-                if angle == -1:
-                    display_text = "Error"
-                else:
-                    display_text = f"{angle:.1f}°"
+                display_text = "Error" if angle == -1 else f"{angle:.1f}°"
                 if component.startswith('leg'):
                     self.leg_value_labels[component].value_labels[joint].setText(display_text)
                 elif component == 'camera':
@@ -740,10 +796,10 @@ class MainWindow(QMainWindow):
     def _update_connection_status(self, connected):
         if connected:
             self.conn_status_value.setText("Connected")
-            self.conn_status_value.setStyleSheet("color: #4CAF50;")
+            self.conn_status_value.setStyleSheet("color: #4CAF50;") # Green
         else:
             self.conn_status_value.setText("Disconnected")
-            self.conn_status_value.setStyleSheet("color: #F44336;")
+            self.conn_status_value.setStyleSheet("color: #F44336;") # Red
 
     def _update_battery1_level(self, level):
         self.batt1_level_value.setText(f"{level}%")
@@ -758,25 +814,31 @@ class MainWindow(QMainWindow):
     def _open_leg_display_handler(self, leg_number):
         win_id = f"leg_{leg_number}"
         if win_id not in self.secondary_windows or not self.secondary_windows[win_id].isVisible():
-            leg_name = f"Leg {leg_number}"
-            self.secondary_windows[win_id] = LegDisplayWindow(leg_name, self.ros_thread)
-            self.secondary_windows[win_id].show()
+            # MODIFICATION: Pass the current ros_thread object
+            if self.ros_thread and self.ros_thread.isRunning():
+                leg_name = f"Leg {leg_number}"
+                self.secondary_windows[win_id] = LegDisplayWindow(leg_name, self.ros_thread)
+                self.secondary_windows[win_id].show()
         else:
             self.secondary_windows[win_id].activateWindow()
 
     def _open_camera_display_handler(self):
         win_id = "camera"
         if win_id not in self.secondary_windows or not self.secondary_windows[win_id].isVisible():
-            self.secondary_windows[win_id] = CameraDisplayWindow(self.ros_thread)
-            self.secondary_windows[win_id].show()
+            # MODIFICATION: Pass the current ros_thread object
+            if self.ros_thread and self.ros_thread.isRunning():
+                self.secondary_windows[win_id] = CameraDisplayWindow(self.ros_thread)
+                self.secondary_windows[win_id].show()
         else:
             self.secondary_windows[win_id].activateWindow()
 
     def _open_imu_display_handler(self):
         win_id = "imu"
         if win_id not in self.secondary_windows or not self.secondary_windows[win_id].isVisible():
-            self.secondary_windows[win_id] = IMUDisplayWindow(self.ros_thread)
-            self.secondary_windows[win_id].show()
+            # MODIFICATION: Pass the current ros_thread object
+            if self.ros_thread and self.ros_thread.isRunning():
+                self.secondary_windows[win_id] = IMUDisplayWindow(self.ros_thread)
+                self.secondary_windows[win_id].show()
         else:
             self.secondary_windows[win_id].activateWindow()
 
@@ -784,7 +846,11 @@ class MainWindow(QMainWindow):
         print("Closing application...")
         for window in self.secondary_windows.values():
             window.close()
-        self.ros_thread.stop()
+        
+        # MODIFICATION: Ensure thread is stopped correctly on close
+        if self.ros_thread and self.ros_thread.isRunning():
+            self.ros_thread.stop()
+            
         event.accept()
 
 def main():
