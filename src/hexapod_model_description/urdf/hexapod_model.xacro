@@ -8,8 +8,6 @@
   <material name="teal">
     <color rgba="0.341 0.737 0.753 1.0"/>
   </material>
-  <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu">
-  </plugin>
 
   <link name="base_link">
     <inertial>
@@ -30,12 +28,6 @@
         <mesh filename="file://$(find hexapod_model_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
-    <sensor name="imu_sensor" type="imu">
-      <always_on>true</always_on>
-      <update_rate>100</update_rate>
-      <visualize>true</visualize>
-      <topic>/imu</topic>
-    </sensor>
   </link>
 
   <link name="leg1_coxa_1">
@@ -803,11 +795,39 @@
       <state_interface name="velocity"/>
     </joint>
   </ros2_control>
-  <gazebo>
-    <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+  
+  <xacro:arg name="robot_name" default="robot_3d"/>
+  <xacro:arg name="prefix" default=""/>
+  <xacro:arg name="use_gazebo" default="false"/>
+
+  <xacro:include filename="$(find hexapod_model_description)/urdf/imu.urdf.xacro"/>
+
+  <xacro:imu_sensor
+      prefix="$(arg prefix)"
+      parent="base_link"
+      frame_id="imu"
+      xyz_offset="0 0 0.006"
+      rpy_offset="0 0 0"
+      update_rate="15.0"
+      topic_name="imu/data"/>
+      
+<gazebo>
+  <plugin
+        filename="gz-sim-scene-broadcaster-system"
+        name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+
+  <plugin filename="gz-sim-imu-system" 
+          name="gz::sim::systems::Imu">
+  </plugin>
+
+  
+    <plugin filename="libgz_ros2_control-system.so" 
+          name="gz_ros2_control::GazeboSimROS2ControlPlugin">
       <parameters>$(find hexapod_model_description)/config/controllers.yaml
         <controller_manager_prefix_node_name>controller_manager</controller_manager_prefix_node_name>
       </parameters>
     </plugin>
   </gazebo>
+
 </robot>

@@ -17,14 +17,14 @@ def generate_launch_description():
     gui_config_path = os.path.join(pkg_hexapod_description, "config", "gui.config")
     robot_description_file = os.path.join(pkg_hexapod_description, 'urdf', 'hexapod_model.xacro')
     robot_description_config = xacro.process_file(robot_description_file)
-    world_file = os.path.join(pkg_hexapod_description, 'worlds', 'hexapod_world.sdf')
+    # world_file = os.path.join(pkg_hexapod_description, 'worlds', 'hexapod_world.sdf')
     
     
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')
         ),
-        launch_arguments={'gz_args': [f'-r -v 4 --gui-config ', gui_config_path, world_file]}.items(),
+        launch_arguments={'gz_args': [f'-r -v 4 --gui-config ', gui_config_path]}.items(),
     )
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
@@ -48,8 +48,14 @@ def generate_launch_description():
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        parameters=[{'config_file': ros_gz_bridge_config}],
-        output='screen'
+        arguments=[
+            "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+            "/imu/data@sensor_msgs/msg/Imu[gz.msgs.IMU"
+        ],
+        output='screen',
+        parameters=[
+                {'use_sim_time': True}
+            ]
     )
 
     joint_state_broadcaster_spawner = Node(
