@@ -89,11 +89,15 @@ for component, joints in RVIZ_JOINT_NAMES.items():
         channel = SERVO_CHANNELS[component][joint_type]
         JOINT_NAME_TO_CHANNEL_MAP[joint_name] = channel
 
+# --- MODIFICATION START: Added separate IMU topics for real vs. sim ---
 ROS_TOPICS = {
     'color': '/camera/camera/color/image_raw',
     'depth': '/camera/camera/depth/image_rect_raw',
-    'gazebo_cmd': '/hexapod_joint_group_controller/command'
+    'gazebo_cmd': '/hexapod_joint_group_controller/command',
+    'imu_real': '/imu/data_raw',
+    'imu_sim': '/imu/data'
 }
+# --- MODIFICATION END ---
 ROS_SERVICES = {
     'set_servo': '/set_servo_angle'
 }
@@ -112,6 +116,9 @@ class RosNodeThread(QThread):
         self.color_sub = None
         self.depth_sub = None
         self.sim_mode = False
+        # --- MODIFICATION START: Initialize IMU sub to None ---
+        self.imu_sub = None
+        # --- MODIFICATION END ---
 
     def run(self):
         # Catch potential init errors if Zenoh router is not available
@@ -131,13 +138,38 @@ class RosNodeThread(QThread):
         self.joint_state_sub = self.node.create_subscription(JointState, 'joint_states', self._joint_state_callback, 10)
         self.battery1_sub = self.node.create_subscription(BatteryState, '/battery1_state', self._battery1_callback, 10)
         self.battery2_sub = self.node.create_subscription(BatteryState, '/battery2_state', self._battery2_callback, 10)
-        self.imu_sub = self.node.create_subscription(Imu, '/imu/data_raw', self._imu_callback, 10)
+        
+        # --- MODIFICATION START: Set up initial subscriptions dynamically ---
+        self.update_subscriptions()
+        # --- MODIFICATION END ---
 
         self.node.get_logger().info("Hexapod GUI ROS2 Node is running.")
         rclpy.spin(self.node)
 
         # Cleanup
         self.node.destroy_node()
+
+    # --- MODIFICATION START: Method to dynamically create IMU subscription ---
+    def update_subscriptions(self):
+        """Creates or recreates subscriptions based on the current mode (real/sim)."""
+        if self.imu_sub is not None:
+            self.node.destroy_subscription(self.imu_sub)
+            self.imu_sub = None
+            self.node.get_logger().info("Destroyed existing IMU subscription.")
+
+        if self.sim_mode:
+            topic = ROS_TOPICS['imu_sim']
+            self.node.get_logger().info(f"SIM MODE: Subscribing to IMU topic '{topic}'")
+        else:
+            topic = ROS_TOPICS['imu_real']
+            self.node.get_logger().info(f"REAL MODE: Subscribing to IMU topic '{topic}'")
+
+        self.imu_sub = self.node.create_subscription(
+            Imu,
+            topic,
+            self._imu_callback,
+            10)
+    # --- MODIFICATION END ---
 
     def _imu_callback(self, msg):
         """Processes incoming IMU messages and updates orientation data."""
@@ -227,12 +259,15 @@ class RosNodeThread(QThread):
         self.set_servo_client.call_async(req)
         self.node.get_logger().info(f"Set servo channel {channel} to {angle} degrees.")
 
+    # --- MODIFICATION START: Call subscription update method ---
     def set_sim_mode(self, enabled):
-        """Sets the simulation mode flag."""
+        """Sets the simulation mode flag and updates subscriptions."""
         self.sim_mode = enabled
         if self.node:
             log_msg = "enabled" if enabled else "disabled"
             self.node.get_logger().info(f"Gazebo simulation publishing is {log_msg}.")
+            self.update_subscriptions()
+    # --- MODIFICATION END ---
 
     def publish_all_joint_states(self, joint_states_dict):
         if not self.node:
@@ -510,16 +545,44 @@ class IMUDisplayWindow(QWidget):
             grid.addWidget(self.value_labels[param], i, 1)
         layout.addLayout(grid)
         self._update_imu_values({'x accel':0,'y accel':0,'z accel':0,'pitch':0,'yaw':0,'roll':0})
+        # --- MODIFICATION START: Connect to telemetry signal for live updates ---
+        self.ros_node.telemetry_update_signal.connect(self._handle_telemetry_update)
+        # --- MODIFICATION END ---
 
     def _send_imu_reset_command(self):
         print("COMMAND: Reset IMU to all zeros.")
         self._update_imu_values({'x accel':0,'y accel':0,'z accel':0,'pitch':0,'yaw':0,'roll':0})
+
+    # --- MODIFICATION START: Add handler for incoming telemetry data ---
+    @pyqtSlot(dict)
+    def _handle_telemetry_update(self, telemetry_data):
+        """Receives telemetry signals and updates the IMU display if data is present."""
+        if all(k in telemetry_data for k in ['x', 'y', 'z', 'pitch', 'yaw', 'roll']):
+            imu_display_data = {
+                'x accel': telemetry_data['x'],
+                'y accel': telemetry_data['y'],
+                'z accel': telemetry_data['z'],
+                'pitch': telemetry_data['pitch'],
+                'yaw': telemetry_data['yaw'],
+                'roll': telemetry_data['roll']
+            }
+            self._update_imu_values(imu_display_data)
+    # --- MODIFICATION END ---
 
     def _update_imu_values(self, imu_data):
         for key, value in imu_data.items():
             if key in self.value_labels:
                 self.value_labels[key].setText(f"{value:.2f}")
 
+    # --- MODIFICATION START: Add closeEvent to disconnect signal ---
+    def closeEvent(self, event):
+        """Disconnects the signal on window close to prevent errors."""
+        try:
+            self.ros_node.telemetry_update_signal.disconnect(self._handle_telemetry_update)
+        except TypeError: # This can happen if the signal is already disconnected
+            pass
+        super().closeEvent(event)
+    # --- MODIFICATION END ---
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):

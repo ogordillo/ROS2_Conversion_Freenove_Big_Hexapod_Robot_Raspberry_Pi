@@ -8,6 +8,8 @@
   <material name="teal">
     <color rgba="0.341 0.737 0.753 1.0"/>
   </material>
+  <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu">
+  </plugin>
 
   <link name="base_link">
     <inertial>
@@ -28,6 +30,12 @@
         <mesh filename="file://$(find hexapod_model_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
+    <sensor name="imu_sensor" type="imu">
+      <always_on>true</always_on>
+      <update_rate>100</update_rate>
+      <visualize>true</visualize>
+      <topic>/imu</topic>
+    </sensor>
   </link>
 
   <link name="leg1_coxa_1">
