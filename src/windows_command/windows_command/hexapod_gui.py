@@ -836,6 +836,7 @@ class MainWindow(QMainWindow):
             self._update_battery2_level(telemetry_data['battery2'])
 
         if all(k in telemetry_data for k in ['x', 'y', 'z', 'pitch', 'yaw', 'roll']):
+            print(telemetry_data)
             imu_data = {k.lower(): telemetry_data[k] for k in ['x', 'y', 'z', 'pitch', 'yaw', 'roll']}
             self.imu_value_labels.value_labels['x accel'].setText(f"{imu_data['x']:.2f}")
             self.imu_value_labels.value_labels['y accel'].setText(f"{imu_data['y']:.2f}")
