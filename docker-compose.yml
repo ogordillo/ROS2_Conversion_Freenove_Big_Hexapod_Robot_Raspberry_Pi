@@ -28,9 +28,9 @@ services:
     command: --config /etc/zenoh/router.yaml
     
 
-  pi_control:
+  control:
     <<: *ros-service
-    container_name: pi_control
+    container_name: control
     image: hexapod_pi_ros_py_img:latest
     depends_on:
       - zenoh_router
@@ -41,7 +41,7 @@ services:
     volumes:
       - ./config/client_config.yaml:/root/config/client.yaml
       - ./src:/root/ros2_ws/src
-      - ./config/realsense_params.yaml:/root/ros2_ws/install/pi_control/share/pi_control/config/realsense_params.yaml
+      - ./config/realsense_params.yaml:/root/ros2_ws/install/control/share/control/config/realsense_params.yaml
       
 
   gazebo:

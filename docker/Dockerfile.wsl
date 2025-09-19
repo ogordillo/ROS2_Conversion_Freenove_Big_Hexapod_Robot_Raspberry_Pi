@@ -42,4 +42,4 @@ COPY ./src ./src
 
 # Source ROS environment and add aliases
 RUN echo "source /opt/ros/${DISTRO}/setup.bash" >> ~/.bashrc
-RUN echo "alias command-hexapod='colcon build && source install/setup.bash && ros2 launch windows_command command.launch.py'" >> ~/.bashrc
+RUN echo "alias command-hexapod='colcon build && source install/setup.bash && ros2 launch command command.launch.py'" >> ~/.bashrc

@@ -38,5 +38,5 @@ COPY ./src ./src
 
 # Source ROS environment and add convenient aliases
 RUN echo "source /opt/ros/${DISTRO}/setup.bash" >> ~/.bashrc
-RUN echo "alias gazebo-hexapod='colcon build && source install/setup.bash && ros2 launch hexapod_model_description gazebo.launch.py'" >> ~/.bashrc
-RUN echo "alias rviz-hexapod='colcon build && source install/setup.bash && ros2 launch hexapod_model_description display.launch.py'" >> ~/.bashrc
+RUN echo "alias gazebo-hexapod='colcon build && source install/setup.bash && ros2 launch simulator gazebo.launch.py'" >> ~/.bashrc
+RUN echo "alias rviz-hexapod='colcon build && source install/setup.bash && ros2 launch simulator display.launch.py'" >> ~/.bashrc

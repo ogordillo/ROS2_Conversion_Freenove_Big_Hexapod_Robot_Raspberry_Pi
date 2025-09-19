@@ -71,7 +71,7 @@ RUN sudo ln -s /usr/include/eigen3/Eigen /usr/include/Eigen
 WORKDIR /root/ros2_ws
 
 RUN echo "source /opt/ros/${DISTRO}/setup.bash" >> ~/.bashrc
-RUN echo "alias control-hexapod='colcon build && source install/setup.bash && (fastdds discovery -i 0 &) && ros2 launch pi_control robot_launch.py'" >> ~/.bashrc
+RUN echo "alias control-hexapod='colcon build && source install/setup.bash && (fastdds discovery -i 0 &) && ros2 launch control robot_launch.py'" >> ~/.bashrc
 
 
 
