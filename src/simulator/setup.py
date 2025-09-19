@@ -26,6 +26,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'imu_filter_node = simulator.gazebo_imu_filter:main',
         ],
     },
 )

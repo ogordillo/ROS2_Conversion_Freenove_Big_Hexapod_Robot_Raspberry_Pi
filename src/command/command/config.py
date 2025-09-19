@@ -69,7 +69,7 @@ ROS_TOPICS = {
     'depth': '/camera/camera/depth/image_rect_raw',
     'gazebo_cmd': '/hexapod_joint_group_controller/command',
     'imu_real': '/imu/data_raw',
-    'imu_sim': '/imu/data',
+    'imu_sim': '/imu/data_sim',
     'joint_states': '/joint_states',
     'battery1': '/battery1_state',
     'battery2': '/battery2_state'

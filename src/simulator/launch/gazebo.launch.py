@@ -17,7 +17,8 @@ def generate_launch_description():
     gui_config_path = os.path.join(pkg_hexapod_description, "config", "gui.config")
     robot_description_file = os.path.join(pkg_hexapod_description, 'urdf', 'hexapod_model.xacro')
     robot_description_config = xacro.process_file(robot_description_file)
-    # world_file = os.path.join(pkg_hexapod_description, 'worlds', 'hexapod_world.sdf')
+    world_file = os.path.join(pkg_hexapod_description, 'worlds', 'hexapod_world.sdf')
+    
     
     
     gz_sim = IncludeLaunchDescription(
@@ -45,13 +46,22 @@ def generate_launch_description():
         output='screen'
     )
 
+    imu_filter_node = Node(
+        package='simulator',
+        executable='imu_filter_node',
+        name='gazebo_imu_filter_node',
+        output='screen'
+    )
+
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=[
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
-            "/imu/data@sensor_msgs/msg/Imu[gz.msgs.IMU"
+            "/imu/data@sensor_msgs/msg/Imu[gz.msgs.IMU",
+            "/imu/data_sim@sensor_msgs/msg/Imu[gz.msgs.IMU"
         ],
+        # remappings=[('/imu/data', '/imu/data_sim_raw')],
         output='screen',
         parameters=[
                 {'use_sim_time': True}
@@ -88,7 +98,8 @@ def generate_launch_description():
         node_robot_state_publisher,
         bridge,
         spawn_entity,
-        delay_joint_trajectory_controller_spawner
+        delay_joint_trajectory_controller_spawner,
+        imu_filter_node
     ])
 
     
