@@ -15,6 +15,7 @@
 
 # Gazebo URDFs
 *.stl
+*.stl:Zone.Identifier
 
 # C/C++ build artifacts
 *.a
@@ -37,3 +38,4 @@ __pycache__/
 # OS-specific files
 .DS_Store
 Thumbs.db
+
