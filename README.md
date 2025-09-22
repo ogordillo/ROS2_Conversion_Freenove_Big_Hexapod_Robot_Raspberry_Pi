@@ -81,19 +81,18 @@ Instructions for running the pi_control and windows_command containers.
 
 ### On WSL
 ```
-docker-compose up windows_command --build
+docker-compose up -d command
+gazebo-hexapod
 ```
 ##### On a seperate terminal while the command gui is running,
 ```
-gazebo_hexapod
-```
-##### On yet another terminal while the command gui is running,
-```
 rviz_hexapod
 ```
+
 ### On the Pi (skip if using Sim Only)
 ```
-docker-compose up pi_control --build
+docker-compose up -d control
+control-hexapod
 ```
 
 
