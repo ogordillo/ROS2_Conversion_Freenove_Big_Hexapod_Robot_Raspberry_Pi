@@ -1,0 +1,42 @@
+# docker/Dockerfile.sim_and_viz
+
+FROM ros:jazzy-ros-base
+
+SHELL ["/bin/bash", "-c"]
+
+ARG DISTRO=jazzy
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV GZ_SIM_SYSTEM_PLUGIN_PATH="/opt/ros/${DISTRO}/lib"
+
+# Install core system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    python3-pip \
+    curl \
+    lsb-release \
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Gazebo, ROS2 Control, RViz, and Zenoh RMW
+RUN apt-get update && apt-get install -y \
+    ros-${DISTRO}-ros-gz \
+    ros-${DISTRO}-ros2-control \
+    ros-${DISTRO}-ros2-controllers \
+    ros-${DISTRO}-gz-ros2-control \
+    ros-${DISTRO}-xacro \
+    ros-${DISTRO}-rviz2 \
+    ros-${DISTRO}-joint-state-publisher \
+    ros-${DISTRO}-joint-state-publisher-gui \
+    ros-${DISTRO}-rmw-zenoh-cpp \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up ROS 2 workspace
+WORKDIR /root/ros2_ws
+COPY ./src ./src
+
+# Source ROS environment and add convenient aliases
+RUN echo "source /opt/ros/${DISTRO}/setup.bash" >> ~/.bashrc
+RUN echo "alias gazebo-hexapod='colcon build && source install/setup.bash && ros2 launch simulator gazebo.launch.py'" >> ~/.bashrc
+RUN echo "alias rviz-hexapod='colcon build && source install/setup.bash && ros2 launch simulator display.launch.py'" >> ~/.bashrc

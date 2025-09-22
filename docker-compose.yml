@@ -1,47 +1,75 @@
 services:
-
-  zenoh-bridge:
-    image: eclipse/zenoh-bridge-ros2dds:latest
-    container_name: zenoh-bridge
+  x-ros-service: &ros-service
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.gazebo
     network_mode: "host"
-
-  pi_control:
-    depends_on:
-      - zenoh-bridge
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile.pi
-    network_mode: host
-    image: hexbot_pi_ros_img:latest
-    container_name: pi_control
-    privileged: true 
-    environment:
-      - ROS_DOMAIN_ID=0
-      - RMW_IMPLEMENTATION=rmw_zenoh_cpp
-    working_dir: /root/ros2_ws
-    volumes:
-      - ./src:/root/ros2_ws/src
-      - ./config/realsense_params.yaml:/root/ros2_ws/install/pi_control/share/pi_control/config/realsense_params.yaml
-    # command: ["bash", "-c", "ntpdate pool.ntp.org && source /opt/ros/jazzy/setup.bash && colcon build && source install/setup.bash && ros2 launch pi_control robot_launch.py"]
-    
-  windows_command:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile.wsl
-    image: hexbot_wsl_ros_img:latest
-    container_name: windows_command
-    privileged: true
+    restart: unless-stopped
     environment:
       - DISPLAY=${DISPLAY}
       - QT_X11_NO_MITSHM=1
-      - XAUTHORITY=/tmp/.docker.xauth
       - ROS_DOMAIN_ID=0
       - RMW_IMPLEMENTATION=rmw_zenoh_cpp
-      - RUST_LOG=zenoh=fatal,zenoh_transport=fatal
       - ZENOH_SESSION_CONFIG_URI=/root/config/client.yaml
-    working_dir: /root/ros2_ws
+      - RUST_LOG=zenoh=fatal,zenoh_transport=fatal
     volumes:
       - ./config/client_config.yaml:/root/config/client.yaml
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ./src:/root/ros2_ws/src
-    command: ["bash", "-c", "ntpdate pool.ntp.org && source /opt/ros/jazzy/setup.bash && colcon build && source install/setup.bash && ros2 launch windows_command window_launch.py"]
+
+  zenoh_router:
+    image: eclipse/zenoh:1.5.0-21-gb222944cb
+    container_name: zenoh_router
+    ports:
+      - "7447:7447/tcp"
+      - "7447:7447/udp"
+    volumes:
+      - ./config/router_config.yaml:/etc/zenoh/router.yaml:ro
+    command: --config /etc/zenoh/router.yaml
+    
+
+  control:
+    <<: *ros-service
+    container_name: control
+    image: hexapod_pi_ros_py_img:latest
+    depends_on:
+      - zenoh_router
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.pi
+    privileged: true 
+    volumes:
+      - ./config/client_config.yaml:/root/config/client.yaml
+      - ./src:/root/ros2_ws/src
+      - ./config/realsense_params.yaml:/root/ros2_ws/install/control/share/control/config/realsense_params.yaml
+      
+
+  gazebo:
+    <<: *ros-service
+    container_name: gazebo
+    image: hexapod_gz_ros_img:latest
+    depends_on:
+      - zenoh_router
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.gazebo
+    privileged: true 
+    command: tail -f /dev/null
+
+  rviz:
+    <<: *ros-service
+    container_name: rviz
+    image: hexapod_gz_ros_img:latest
+    depends_on:
+      - gazebo
+    command: tail -f /dev/null
+
+  command:
+    <<: *ros-service
+    container_name: command
+    image: hexapod_cmd_ros_py_img:latest
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.wsl
+    privileged: true
+    command: tail -f /dev/null
