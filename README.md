@@ -62,7 +62,7 @@ First assemble the robot and test it to be operational.
 
 https://drive.google.com/drive/folders/1VZxh9XcH7hnItRFQC2-phcYuDbOMEweY?usp=sharing
 
-Place the meshes folder in src/hexapod_model_description/meshes
+Place the meshes folder in src/simulator/meshes
 
 The URDF was created using <a href="https://github.com/runtimerobotics/fusion360-urdf-ros2">this exporter</a>
 
@@ -70,14 +70,14 @@ The meshes for the URDF files and the original CAD models from the vendor are on
 
 ## Setting up Docker/WSL on Windows
 
-Instructions are in the README.md in src/windows_command/README.md
+Instructions are in the README.md in src/command/README.md
 
 ## Setting up Docker on RaspberryPi 5 (skip if doing Sim Only)
 
-Instructions are in the README.md in src/pi_control/README.md
+Instructions are in the README.md in src/control/README.md
 
 ## Starting the Applications
-Instructions for running the pi_control and windows_command containers. 
+Instructions for running the control and command containers. 
 
 ### On WSL
 ```
